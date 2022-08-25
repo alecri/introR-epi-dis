@@ -12,7 +12,7 @@ marathon_raw <- marathon %>%
     waterload = as.double(waterload),
     nsaid = as.double(nsaid)
   ) %>% 
-  select(-nas135, -wtdiff, -wtdiffc, -female) %>% 
+  select(-nas135, -wtdiff, -wtdiffc, -female, -bmi) %>% 
   as.data.frame() %>% 
   remove_labels() %>% 
   remove_attributes("format.stata")
