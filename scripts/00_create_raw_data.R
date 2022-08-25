@@ -18,3 +18,4 @@ marathon_raw <- marathon %>%
   remove_attributes("format.stata")
 
 write.csv(marathon_raw, here::here("data", "raw", "marathon_raw.csv"), row.names = FALSE)
+
