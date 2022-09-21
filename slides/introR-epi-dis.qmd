@@ -1,0 +1,311 @@
+---
+title: "A modern demonstration of R for epidemiologists"
+subtitle: "Epidemiology: Swedish Case Studies - October 5th, 2022"
+author: "Alessio Crippa"
+format: 
+  revealjs:
+    footer: "[https://github.com/alecri/introR-epi-dis](https://github.com/alecri/introR-epi-dis)&nbsp;&nbsp;&nbsp;"
+    theme: slides.scss
+    preview-links: auto
+    chalkboard: 
+      boardmarker-width: 5
+from: markdown+emoji
+execute:
+  echo: true
+---
+
+# Introduction
+
+```{r}
+#| echo: false
+#| cache: false
+library(knitr)
+library(tidyverse)
+library(here)
+knitr::opts_chunk$set(echo = TRUE, fig.width = 4.5, message = F, warning = F)
+faculty <- read_csv("faculty.csv")
+courses <- read_csv("courses.csv")
+# fill for font awesome icons
+fa_fill <- "#606060"
+```
+
+## Alessio Crippa
+
+::: {.columns .v-center-container}
+::: {.column width="60%"}
+- R-enthusiastic  
+- More than 4 years R experience  
+- 2 packages on CRAN (and GitHub)  
+- Web applications with Shiny R  
+- Reproducible research with R markdown  
+- Co-organizer of the Stockholm R useR group (SRUG)  
+
+`r fontawesome::fa("link", fill = fa_fill)` [alecri.github.io](https://alecri.github.io/)  
+`r fontawesome::fa("github", fill = fa_fill)` [github.com/alecri](https://github.com/alecri/)  
+:::
+
+::: {.column width="40%"}
+![](images/Rbaby-circle.png)
+:::
+:::
+
+
+## Today's plan
+
+<br/>
+
+- A **modern**: using *RStudio*, *tidyverse*, and *reproducible research*.
+
+- **Demonstration** of R: *interactive* and *adaptive* workshop.
+
+- For **epidemiologists**: real world data.
+
+
+## Outline
+
+<br/>
+
+1. Introduction to R and RStudio  
+2. Data Manipulation  
+3. Exploratory Data Analysis  
+    * Summary statistics  
+    * Informative graphs  
+    * Common models  
+4. Introduction to More Advanced Concepts  
+    * Workflow: projects  
+    * More advance analyses
+    * Reproducible research (rmarkdown)  
+5. Learn more about R
+
+
+## R for Data Science
+
+<br/><br/>
+
+![[https://r4ds.had.co.nz/introduction.html](https://r4ds.had.co.nz/introduction.html)](images/data-science.png)
+
+
+## Motivating example
+
+<br/>
+
+**Descriptive abstract**  
+Hyponatremia has emerged as an important cause of race-related death and life-threatening illness among marathon runners. We studied a cohort of marathon runners to estimate the incidence of hyponatremia and to identify the principal risk factors.
+
+<br/>
+
+**Reference**  
+[*Hyponatremia among Runners in the Boston Marathon*, New England Journal of Medicine, 2005, Volume 352:1550-1556](https://pubmed.ncbi.nlm.nih.gov/15829535/)
+
+
+
+## Workshop material
+
+<br/>
+
+The material for today is available [here](https://github.com/alecri/introR-epi-dis).  
+Click big green Code button and select “Download ZIP”, then open introR-epi-dis.Rproj
+
+::: {.absolute top="40%" left="0"}
+::: {style="text-align: center"}
+![](images/github_repo.png)
+:::
+:::
+
+
+## Folder structure
+
+<br/>
+
+```
+project
+│   README.md
+│   introR-epi-dis.Rproj   
+│
+└───articles
+│   │   hyponatremia.pdf
+│   │   file012.txt
+│   │
+└───data
+│   └───raw
+│   |    marathon_raw.csv
+│   └───derived
+│   |    marathon.RData
+└───scripts
+│   │   01_data_management.R
+│   │   02_descriptive_statistics.R
+│   │   03_analyses.R
+│   │   ...
+│   │
+└───output
+│   └───figures
+│   |   ...
+│   └───tables
+│   │   ...
+│   │
+└───report
+│   │   marathon_report1.qmd
+│   |   ...
+│   │
+└───slides
+│   |   ...
+
+```
+
+
+# Interactive workshop
+
+## Interactive workshop
+
+<br/>
+
+**1. Introduction to R and RStudio**
+
+**2. Basic data manipulation**  
+
+`scripts/01_data_management.R`
+
+**3. Exploratory Data Analysis**  
+
+`scripts/02_descriptive_statistics.R`
+
+**4. Introduction to More Advanced Concepts**  
+
+`scripts/03_analyses.R`
+
+
+# Introduction to R and RStudio  
+
+## Why R
+
+<br/>
+
+- **Free** and **open source** language for statistical computing and graphics  
+- One of the most popular programming languages in both academia and industries  
+- Support for reproducible research and interactive analyses  
+- Interconnection with other programming languages  
+- Vast community support ([RStudio](https://www.rstudio.com/), [Stack Overflow](https://stackoverflow.com/))  
+
+---
+
+## Navigating RStudio
+
+::: {.absolute top="10%" left="0" width="1031" height="529"}
+::: {style="text-align: center"}
+![](images/RStudio1.png)
+:::
+:::
+
+::: {.absolute top="66%" left="65%"}
+::: {style="color: #cc0000"}
+project files are here
+:::
+:::
+
+. . .
+
+::: {.absolute top="28%" left="70%"}
+::: {style="color: #cc0000"}
+imported data shows up here
+:::
+:::
+
+. . .
+
+::: {.absolute top="60%" left="10%"}
+::: {style="color: #cc0000"}
+output and code *can* go here
+:::
+:::
+
+---
+
+## Navigating RStudio
+
+::: {.absolute top="10%" left="0" width="1031" height="529"}
+::: {style="text-align: center"}
+![](images/RStudio2.png)
+:::
+:::
+
+::: {.absolute top="66%" left="65%"}
+::: {style="color: #cc0000"}
+project files are here
+:::
+:::
+
+::: {.absolute top="28%" left="70%"}
+::: {style="color: #cc0000"}
+imported data shows up here
+:::
+:::
+
+::: {.absolute top="35%" left="25%"}
+::: {style="color: #cc0000"}
+code can also<br>go here
+:::
+:::
+
+::: {.absolute top="70%" left="10%"}
+::: {style="color: #cc0000"}
+output (and code) *can* go here
+:::
+:::
+
+
+
+---
+
+## Using R via *tidyverse*
+
+The [tidyverse](https://www.tidyverse.org/) is a set of packages that work in harmony because they share common data representations and API design.
+
+::: {.columns .v-center-container}
+::: {.column width="60%"}
+It includes:
+
+- [ggplot2](https://ggplot2.tidyverse.org/), for data visualisation  
+- [dplyr](https://dplyr.tidyverse.org/), for data manipulation  
+- [tidyr](https://tidyr.tidyverse.org/), for data tidying  
+- [readr](https://readr.tidyverse.org/), for data import  
+- [purrr](https://purrr.tidyverse.org/), for functional programming  
+- [tibble](https://tibble.tidyverse.org/), for modern data frames  
+- and many more ...
+:::
+
+::: {.column width="40%"}
+![](images/tidyverse.png)
+:::
+:::
+
+
+# Data Manipulation
+
+
+# Exploratory Data Analysis
+
+
+# Introduction to More Advanced Concepts
+
+
+# Learn more about R
+
+## Resources
+
+<br/>
+
+- [R for Data Science](https://r4ds.had.co.nz/): the ultimate guide
+
+- [R for Excel users](https://rstudio-conf-2020.github.io/r-for-excel/): a very useful workshop
+
+- [STAT 545](https://stat545.com/): an online book on reproducible data analysis in R
+
+<br>
+
+- The [RStudio Education](https://education.rstudio.com/) site
+
+- The [Learn `tidyverse`](https://www.tidyverse.org/learn/) site
+
+<br>
+
+https://alecri.github.io/courses/

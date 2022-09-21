@@ -1,0 +1,37 @@
+---
+title: "Descriptive analyses of the marathon data"
+author: "Alessio Crippa"
+date: "August 25th, 2022"
+toc: true
+format:
+  html:
+    html-math-method: katex
+    code-tools: true
+    self-contained: true
+execute:
+  warning: false
+  echo: false
+---
+
+```{r load_data}
+#| include: false
+#| echo: false
+library(tidyverse)
+library(here)
+library(knitr)
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+load(here("data", "derived", "marathon.RData"))
+
+```
+
+## Objective
+
+This report contains some descriptive analyses, both uni and multivariate, of the marathon data, which was use in the following publication [Hyponatremia among Runners in the Boston Marathon, N Engl J Med 2005;352:1550-6](http://alecri.github.io/downloads/hyponatremia.pdf).
+
+Here is a glimpse of the data.
+
+```{r}
+glimpse(marathon)
+```
+
+## Univariate analyses

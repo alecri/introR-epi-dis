@@ -8,7 +8,6 @@ library(labelled)
 library(skimr)
 library(flextable)
 library(Hmisc)
-library(writexl)
 
 
 # read raw data ----
@@ -19,7 +18,7 @@ marathon_raw <- read.csv(here("data", "raw", "marathon_raw.csv"))
 
 View(marathon_raw)        # open in a data viewer
 head(marathon_raw, 10)    # display first 10 raw
-str(marathon_raw)         # get the structure
+glimpse(marathon_raw)     # get a gimplse of the data
 names(marathon_raw)       # get the columns names
 dim(marathon_raw)         # how many raws/variables
 
@@ -78,9 +77,6 @@ flextable(women_250)
 arrange(women_250, desc(na), runtime)
 
 ## create and modify variables ----
-summary(marathon$wtdiff)
-summary(marathon$bmi)
-
 marathon <- marathon %>% 
   mutate(
     runtime = runtime/60,
@@ -89,7 +85,7 @@ marathon <- marathon %>%
                      include.lowest = T, right = FALSE, ordered_result = TRUE),
     age_cat = cut2(age, g = 5, digits = 1),
     bmi = prewt/(height^2),
-    bmi_cat = cut(bmi, breaks = c(15, 20, 25, 33), labels = c("< 20 (%)", "20-25 (%)", ">25 (%)")),
+    bmi_cat = cut(bmi, breaks = c(15, 20, 25, 33), labels = c("< 20", "20-25", ">25")),
     nas135 = factor(na <= 135, labels = c("na > 135", "na ≤ 135")),
     nas130 = factor(na <= 130, labels = c("na > 130", "na ≤ 130"))
   ) %>% 
