@@ -55,3 +55,7 @@ project
 │   |   ...
 
 ```
+
+## Reproduce the material
+
+You can access and reproduce the repository material in RStudio Cloud at the following link [https://rstudio.cloud/content/4558101](https://rstudio.cloud/content/4558101) .
