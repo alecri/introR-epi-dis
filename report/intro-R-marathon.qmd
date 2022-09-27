@@ -19,15 +19,12 @@ execute:
 
 This report contains code for an introduction to R and how to perform common descriptive analyses, both uni- and multi-variate, using the marathon data, which was use in the following publication [Hyponatremia among Runners in the Boston Marathon, N Engl J Med 2005;352:1550-6](https://www.nejm.org/doi/full/10.1056/NEJMoa043901) .
 
-**Descriptive abstract**  
-Hyponatremia has emerged as an important cause of race-related death and life-threatening 
-illness among marathon runners. We studied a cohort of marathon runners to estimate the 
-incidence of hyponatremia and to identify the principal risk factors.
+**Descriptive abstract**\
+Hyponatremia has emerged as an important cause of race-related death and life-threatening illness among marathon runners. We studied a cohort of marathon runners to estimate the incidence of hyponatremia and to identify the principal risk factors.
 
 ## Load R packages
 
-The following packages are used in the tutorial. If you want to reproduce the code
-chunks below, be sure to install them (e.g. `install.packages("tidyverse")`).
+The following packages are used in the tutorial. If you want to reproduce the code chunks below, be sure to install them (e.g. `install.packages("tidyverse")`).
 
 ```{r setting}
 #| results: hide
@@ -56,13 +53,13 @@ marathon <- read.csv(here("data", "raw", "marathon_raw.csv"))
 gt(head(marathon)) %>% tab_options(table.font.size = px(12))
 ```
 
-Many other options exist, such as:  
+Many other options exist, such as:
 
-- basic functions (`read.table`, `read.csv`, `read.delim`)  
-- from Excel `readxl::read_excel`  
-- from SPSS `haven::read_sav`  
-- from SAS `haven::read_sas`
-- from Stata `haven::read_dta`
+-   basic functions (`read.table`, `read.csv`, `read.delim`)\
+-   from Excel `readxl::read_excel`\
+-   from SPSS `haven::read_sav`\
+-   from SAS `haven::read_sas`
+-   from Stata `haven::read_dta`
 
 A comprehensive tutorial can be found [here](https://www.datacamp.com/community/tutorials/r-data-import-tutorial).
 
@@ -85,14 +82,12 @@ head(marathon)
 summary(marathon)
 ```
 
-
 ### Manipulate data
 
-Data manipulations consist of a multiplicity and combinations of steps.
-The `dplyr` package in `tidyverse` aids this task with a collections of *verbs*.  
-I will show how to:  
+Data manipulations consist of a multiplicity and combinations of steps. The `dplyr` package in `tidyverse` aids this task with a collections of *verbs*.\
+I will show how to:
 
-1. create/modify variables with the `mutate` verb.  
+1.  create/modify variables with the `mutate` verb.
 
 ```{r data_management}
 marathon <- mutate(
@@ -111,22 +106,21 @@ marathon <- mutate(
 )
 ```
 
-2. select only variables of interest with the `select` verb.
+2.  select only variables of interest with the `select` verb.
 
 ```{r select}
 marathon_sub1 <- select(marathon, sex, runtime, ends_with("wt"), bmi, na)
 gt(head(marathon_sub1)) %>% tab_options(table.font.size = px(12))
 ```
 
-3. select only some observations with the `filter` verb.
+3.  select only some observations with the `filter` verb.
 
 ```{r filter}
 women_sub2 <- filter(marathon_sub1, sex == "Female", runtime >= 4, bmi > 25)
 gt(women_sub2) %>% tab_options(table.font.size = px(12))
 ```
 
-4. sort data according to increasing/decreasing values of some variables with the
-`arrange` verb.
+4.  sort data according to increasing/decreasing values of some variables with the `arrange` verb.
 
 ```{r}
 arrange(women_sub2, desc(na), runtime)
@@ -146,7 +140,8 @@ arrange(
     sex == "Female", runtime >= 4, bmi > 25), desc(na), runtime)
 ```
 
-### The %>% (pipe) operator  
+### The %\>% (pipe) operator
+
 This operator allows you to pipe the output from one function to the input of another function.
 
 ```{r}
@@ -158,7 +153,6 @@ marathon %>%
   filter(sex == "Female", runtime >= 4, bmi > 25) %>%
   arrange(desc(na), runtime)
 ```
-
 
 ## Summary statistics and graphs
 
@@ -172,7 +166,6 @@ ggplot(marathon, aes(wtdiff, na, col = bmi)) +
   labs(x = "Weight change, kg", y = "Sodium concentration, mmol per liter") +
   theme_bw()
 ```
-
 
 ### Univariate descriptives
 
@@ -227,7 +220,6 @@ ggplot(marathon, aes(nas135)) +
   labs(x = "", y = "Prevalence of hyponatremia")
 ```
 
-
 ### Bivariate descriptives (association)
 
 ```{r cont_cat}
@@ -260,7 +252,6 @@ Epi::ci.lin(lm_nasex)
 wilcox.test(na ~ sex, data = marathon)
 ```
 
-
 ```{r twobytwo}
 # frequencies table
 tab_nabmi <- table(bmi_cat = marathon$bmi_cat, nas135 = marathon$nas135)
@@ -285,7 +276,6 @@ twoby2(tab_nabmi[1:2, 2:1])
 twoby2(tab_nabmi[3:2, 2:1])
 ```
 
-
 ```{r two_cont}
 # correlation coefficient
 with(marathon, cor(na, wtdiff,  method = "pearson", use = "complete.obs"))
@@ -305,7 +295,6 @@ ggExtra::ggMarginal(p_nawtdiff, type = "histogram")
 tab1 <- arsenal::tableby(nas135 ~ age + sex + wtdiff + bmi_cat + runtime, data = marathon)
 summary(tab1)
 ```
-
 
 ## Statistical models
 
@@ -350,10 +339,10 @@ gridExtra::grid.arrange(
 )
 ```
 
-
 ### Logistic regression
 
 $$\log(\textrm{odds}(Y|X)) = \beta_0 + \beta_1X_1 + \dots + \beta_kX_k$$
+
 ```{r}
 # univariate logistic regression
 fit4 <- glm(nas135 ~ wtdiff, data = marathon, family = binomial)
