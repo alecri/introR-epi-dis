@@ -29,3 +29,4 @@ vignettes/*.pdf
 
 00_create_raw_data.R
 **/.DS_Store
+report/intro-R-marathon.html
