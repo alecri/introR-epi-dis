@@ -3,7 +3,6 @@
 # libraries & setting ----
 
 library(tidyverse)
-library(here)
 library(gtsummary)
 library(flextable)
 library(officer)
@@ -12,7 +11,7 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 
 # load derived data ----
-load(here("data", "derived", "marathon.RData"))
+load("data/derived/marathon.RData")
 
 
 # analyses ----
@@ -45,7 +44,7 @@ tab1
 # save tab1 in output folder
 tab1 %>% 
   as_flex_table() %>% 
-  save_as_docx(path = here("output", "tables", "tab1.docx"))
+  save_as_docx(path = "output/tables/tab1.docx")
 
 
 # figure 1 ----
@@ -76,7 +75,7 @@ p_fig1 <- ggplot(hypo_severity, aes(wtdiff_cat, y = risk, fill = severity)) +
 p_fig1
 
 # save figure in output folder
-ggsave(filename = here("output", "figures", "fig1.pdf"), p_fig1, height = 6, width = 8)
+ggsave(filename = "output/figures/fig1.pdf", p_fig1, height = 6, width = 8)
 
 
 
@@ -103,7 +102,7 @@ p_fig2a <- ggplot(pred_wc, aes(wtdiff, or)) +
   xlim(range(pred_wc$wtdiff))
 p_fig2a
 
-ggsave(filename = here("output", "figures", "fig2a.pdf"), p_fig2a, height = 6, width = 8)
+ggsave(filename = "output/figures/fig2a.pdf", p_fig2a, height = 6, width = 8)
 
 
 # table 2 ----
@@ -119,7 +118,7 @@ tab2 <- tbl_merge(list(tab2_part1, tab2_part2),
 
 tab2 %>% 
   as_flex_table() %>% 
-  save_as_docx(path = here("output", "tables", "tab2.docx"),
+  save_as_docx(path = "output/tables/tab2.docx",
                pr_section = prop_section(
                  page_size = page_size(orient = "landscape", width = 12, height = 9)
                ))

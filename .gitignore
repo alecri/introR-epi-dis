@@ -28,4 +28,4 @@ vignettes/*.pdf
 .Renviron
 
 00_create_raw_data.R
-.DS_Store
+**/.DS_Store

@@ -1,0 +1,385 @@
+---
+title: "The Marathon Data"
+subtitle: "Intro to R and Some Descriptive Analyses" 
+author: "Alessio Crippa"
+date: "2022-09-22"
+toc: true
+format:
+  html:
+    page-layout: full
+    fontsize: .9em
+    html-math-method: katex
+    self-contained: true
+execute:
+  warning: false
+  echo: true
+---
+
+## Objective
+
+This report contains code for an introduction to R and how to perform common descriptive analyses, both uni- and multi-variate, using the marathon data, which was use in the following publication [Hyponatremia among Runners in the Boston Marathon, N Engl J Med 2005;352:1550-6](https://www.nejm.org/doi/full/10.1056/NEJMoa043901) .
+
+**Descriptive abstract**  
+Hyponatremia has emerged as an important cause of race-related death and life-threatening 
+illness among marathon runners. We studied a cohort of marathon runners to estimate the 
+incidence of hyponatremia and to identify the principal risk factors.
+
+## Load R packages
+
+The following packages are used in the tutorial. If you want to reproduce the code
+chunks below, be sure to install them (e.g. `install.packages("tidyverse")`).
+
+```{r setting}
+#| results: hide
+#| echo: false
+library(tidyverse)
+library(here)
+library(gt)
+library(scales)
+library(broom)
+library(Epi)
+library(ggExtra)
+library(arsenal)
+library(gridExtra)
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+```
+
+## Read, explore and manipulate data
+
+### Read data
+
+The `marathon` data are available in a csv format at http://alecri.github.io/downloads/data/marathon.csv .
+
+```{r}
+#| output: asis
+marathon <- read.csv(here("data", "raw", "marathon_raw.csv"))
+gt(head(marathon)) %>% tab_options(table.font.size = px(12))
+```
+
+Many other options exist, such as:  
+
+- basic functions (`read.table`, `read.csv`, `read.delim`)  
+- from Excel `readxl::read_excel`  
+- from SPSS `haven::read_sav`  
+- from SAS `haven::read_sas`
+- from Stata `haven::read_dta`
+
+A comprehensive tutorial can be found [here](https://www.datacamp.com/community/tutorials/r-data-import-tutorial).
+
+### Explore the data
+
+```{r}
+# what is the dimension of the data  
+dim(marathon)
+# i.e. how many obs/rows
+nrow(marathon)
+# how many cols/variables?
+ncol(marathon)
+# what's the name of the variable
+colnames(marathon)
+# what is the structure of the data
+glimpse(marathon)
+# show the first rows
+head(marathon)
+# quick and dirty summary
+summary(marathon)
+```
+
+
+### Manipulate data
+
+Data manipulations consist of a multiplicity and combinations of steps.
+The `dplyr` package in `tidyverse` aids this task with a collections of *verbs*.  
+I will show how to:  
+
+1. create/modify variables with the `mutate` verb.  
+
+```{r data_management}
+marathon <- mutate(
+  marathon, 
+  # code a factor variables
+  sex = factor(sex, levels = c(1, 2), labels = c("Male", "Female")),
+  nas135 = factor(na <= 135, labels = c("na > 135", "na ≤ 135")),
+  # compute new variables
+  runtime = runtime/60,
+  wtdiff = postwt - prewt,
+  bmi = prewt/(height^2),
+  # categorize continuous variables
+  bmi_cat = cut(bmi, breaks = c(15, 20, 25, 33), labels = c("< 20", "20-25", ">25")),
+  wtdiff_cat = cut(wtdiff, breaks = c(-5, -2, -1, 0, 1, 2, 3, 5), 
+                   include.lowest = T, right = FALSE, ordered_result = TRUE)
+)
+```
+
+2. select only variables of interest with the `select` verb.
+
+```{r select}
+marathon_sub1 <- select(marathon, sex, runtime, ends_with("wt"), bmi, na)
+gt(head(marathon_sub1)) %>% tab_options(table.font.size = px(12))
+```
+
+3. select only some observations with the `filter` verb.
+
+```{r filter}
+women_sub2 <- filter(marathon_sub1, sex == "Female", runtime >= 4, bmi > 25)
+gt(women_sub2) %>% tab_options(table.font.size = px(12))
+```
+
+4. sort data according to increasing/decreasing values of some variables with the
+`arrange` verb.
+
+```{r}
+arrange(women_sub2, desc(na), runtime)
+```
+
+Chaining: wrap different functions inside each other
+
+```{r}
+arrange(
+  filter(
+    select(
+      mutate(marathon, 
+             sex = factor(sex, levels = c(1, 2), labels = c("Male", "Female")),
+             runtime = runtime/60,
+             bmi = prewt/(height^2)),
+      sex, runtime, ends_with("wt"), bmi, na),
+    sex == "Female", runtime >= 4, bmi > 25), desc(na), runtime)
+```
+
+### The %>% (pipe) operator  
+This operator allows you to pipe the output from one function to the input of another function.
+
+```{r}
+marathon %>% 
+  mutate(sex = factor(sex, levels = c(1, 2), labels = c("Male", "Female")),
+         runtime = runtime/60,
+         bmi = prewt/(height^2)) %>% 
+  select(sex, runtime, ends_with("wt"), bmi, na) %>%
+  filter(sex == "Female", runtime >= 4, bmi > 25) %>%
+  arrange(desc(na), runtime)
+```
+
+
+## Summary statistics and graphs
+
+### ggplot2: grammar of graphics
+
+```{r}
+ggplot(marathon, aes(wtdiff, na, col = bmi)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ sex) +
+  labs(x = "Weight change, kg", y = "Sodium concentration, mmol per liter") +
+  theme_bw()
+```
+
+
+### Univariate descriptives
+
+```{r}
+# for a continuous variable
+summary(marathon$na)
+quantile(marathon$na) # percentiles (or quantiles)
+c("Mean" = mean(marathon$na), "SD" = sd(marathon$na),
+  "Median" = median(marathon$na), "IQR" = IQR(marathon$na),
+  "Min" = min(marathon$na), "Max" = max(marathon$na),
+  "25th percentile" = quantile(marathon$na, .25),
+  "75th percentile" = quantile(marathon$na, .75))
+summarise(marathon, mean = mean(na), sd = sd(na), median = median(na), iqr = IQR(na))
+# histogram (counts)
+ggplot(marathon, aes(na)) + 
+  geom_histogram() +
+  labs(x = "Serum sodium concentration (mmol/liter)")
+# histogram (density)
+ggplot(marathon, aes(na)) +
+  geom_histogram(stat = "density", n = 2^5) +
+  geom_line(stat = "density", col = "blue", size = 1.5) +
+  labs(x = "Sodium concentration, mmol per liter")
+# boxplot
+ggplot(marathon, aes(na)) + 
+  geom_boxplot() + 
+  coord_flip() +
+  labs(x = "Serum sodium concentration (mmol/liter)")
+# violin plot
+ggplot(marathon, aes(x = "", y = na)) + 
+  geom_violin(fill = "lightblue") + 
+  geom_jitter(size = 1) +
+  labs(x = "", y = "Serum sodium concentration (mmol/liter)")
+```
+
+```{r}
+# for a categorical variable
+table(marathon$nas135)
+prop.table(table(marathon$nas135))
+# alternative
+dtab_nas135 <- count(marathon, nas135) %>% 
+  mutate(
+    prop = n/sum(n),
+    percentage = scales::percent(prop)
+  )
+dtab_nas135
+# barplot (counts)
+ggplot(marathon, aes(nas135)) +
+  geom_bar()
+# barplot (proportion)
+ggplot(marathon, aes(nas135)) +
+  geom_bar(aes(y = ..count../sum(..count..))) +
+  labs(x = "", y = "Prevalence of hyponatremia")
+```
+
+
+### Bivariate descriptives (association)
+
+```{r cont_cat}
+# Continuous + categorical
+by(marathon$na, marathon$sex, summary)
+group_by(marathon, sex) %>% 
+  summarise(n_nomiss = sum(!is.na(na)), 
+            mean = mean(na), 
+            median = median(na),
+            sd = sd(na), 
+            iqr = IQR(na), 
+            min = min(na), 
+            max = max(na),
+            p25 = quantile(na, .25),
+            p75 = quantile(na, .75))
+# boxplot by levels
+ggplot(marathon, aes(sex, na)) +
+  geom_boxplot() + 
+  labs(x = "", y = "Serum sodium concentration (mmol/liter)")
+ggplot(marathon, aes(na, col = sex)) +
+  geom_line(stat = "density") + 
+  labs(x = "Serum sodium concentration (mmol/liter)", y = "Density")
+# statistical tests
+test_nasex <- t.test(na ~ sex, data = marathon, var.equal = TRUE)
+test_nasex
+broom::tidy(test_nasex)
+# equivalent linear model
+lm_nasex <- lm(na ~ sex, data = marathon)
+Epi::ci.lin(lm_nasex)
+wilcox.test(na ~ sex, data = marathon)
+```
+
+
+```{r twobytwo}
+# frequencies table
+tab_nabmi <- table(bmi_cat = marathon$bmi_cat, nas135 = marathon$nas135)
+tab_nabmi
+prop.table(tab_nabmi, margin = 1)
+# customizable tables
+Epi::stat.table(list(nas135, bmi_cat), 
+           list(count(), percent(nas135)), 
+           marathon, margin = T)
+# bar plot
+group_by(marathon, bmi_cat) %>%
+  filter(!is.na(bmi_cat)) %>% 
+  count(nas135) %>%
+  mutate(perc = n/sum(n)) %>%
+  ggplot(aes(x = nas135, y = perc, fill = bmi_cat)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(x = "", y = "Frequency", fill = "Categories of BMI")
+# test for independence 
+chisq.test(tab_nabmi)
+# measure of associations
+twoby2(tab_nabmi[1:2, 2:1])
+twoby2(tab_nabmi[3:2, 2:1])
+```
+
+
+```{r two_cont}
+# correlation coefficient
+with(marathon, cor(na, wtdiff,  method = "pearson", use = "complete.obs"))
+# scatter plot + regression line
+p_nawtdiff <- ggplot(marathon, aes(wtdiff, na)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  labs(x = "Weight change (kg) pre/post race", y = "Serum sodium concentration (mmol/liter)")
+ggExtra::ggMarginal(p_nawtdiff, type = "histogram")
+```
+
+### Table 1
+
+```{r table1}
+#| results: asis
+# Table 1
+tab1 <- arsenal::tableby(nas135 ~ age + sex + wtdiff + bmi_cat + runtime, data = marathon)
+summary(tab1)
+```
+
+
+## Statistical models
+
+### Linear regression
+
+$$E[Y|X] = \beta_0 + \beta_1X_1 + \dots + \beta_kX_k$$
+
+```{r}
+# univariate linear regression
+fit1 <- lm(na ~ sex, data = marathon)
+summary(fit1)
+tidy(fit1, conf.int = T)
+```
+
+```{r}
+# multivariable linear regression
+fit2 <- lm(na ~ wtdiff + sex, data = marathon)
+ci.lin(fit2)
+marathon <- mutate(marathon,
+                   pred_fit2 = predict(fit2, newdata = marathon))
+```
+
+```{r}
+# multivariable linear regression with interaction
+fit3 <- lm(na ~ wtdiff*sex, data = marathon)
+ci.lin(fit3, ctr.mat = rbind(c(0, 1, 0, 0),
+                             c(0, 1, 0, 1)))
+marathon <- mutate(marathon,
+                   pred_fit3 = predict(fit3, newdata = marathon))
+```
+
+```{r}
+# graphical comparison
+gridExtra::grid.arrange(
+  ggplot(marathon, aes(wtdiff, pred_fit2, col = sex)) +
+    geom_line() +
+    labs(x = "Weight change, kg", y = "Predicted mean na"),
+    ggplot(marathon, aes(wtdiff, pred_fit3, col = sex)) +
+    geom_line() +
+    labs(x = "Weight change, kg", y = "Predicted mean na"),
+  ncol = 2
+)
+```
+
+
+### Logistic regression
+
+$$\log(\textrm{odds}(Y|X)) = \beta_0 + \beta_1X_1 + \dots + \beta_kX_k$$
+```{r}
+# univariate logistic regression
+fit4 <- glm(nas135 ~ wtdiff, data = marathon, family = binomial)
+ci.exp(fit4)
+
+marathon <- marathon %>% 
+  mutate(pred_p = predict(fit4, newdata = marathon, type = "response"),
+         pred_odds = predict(fit4, newdata = marathon, type = "link")) 
+
+grid.arrange(
+  ggplot(marathon, aes(wtdiff, pred_p)) +
+    geom_line() +
+    labs(x = "Weight change, kg", y = "Predicted probability"),
+  ggplot(marathon, aes(wtdiff, pred_odds)) +
+    geom_line() +
+    labs(x = "Weight change, kg", y = "Predicted odds"),
+  ncol = 2
+)
+```
+
+```{r}
+# multivariable logistic regression
+fit5 <- glm(nas135 ~ wtdiff + sex, data = marathon, family = binomial)
+ci.exp(fit5)
+mutate(marathon, pred = predict(fit5, newdata = marathon, type = "response")) %>% 
+  ggplot(aes(wtdiff, pred, col = sex)) +
+  geom_line() +
+  labs(x = "Weight change, kg", y = "Predicted probability")
+```

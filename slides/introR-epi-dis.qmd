@@ -6,9 +6,8 @@ format:
   revealjs:
     footer: "[https://github.com/alecri/introR-epi-dis](https://github.com/alecri/introR-epi-dis)&nbsp;&nbsp;&nbsp;"
     theme: slides.scss
+    self-contained: true
     preview-links: auto
-    chalkboard: 
-      boardmarker-width: 5
 from: markdown+emoji
 execute:
   echo: true
@@ -23,8 +22,6 @@ library(knitr)
 library(tidyverse)
 library(here)
 knitr::opts_chunk$set(echo = TRUE, fig.width = 4.5, message = F, warning = F)
-faculty <- read_csv("faculty.csv")
-courses <- read_csv("courses.csv")
 # fill for font awesome icons
 fa_fill <- "#606060"
 ```
@@ -62,8 +59,6 @@ fa_fill <- "#606060"
 
 
 ## Outline
-
-<br/>
 
 1. Introduction to R and RStudio  
 2. Data Manipulation  
