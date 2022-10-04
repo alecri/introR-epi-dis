@@ -31,4 +31,5 @@ vignettes/*.pdf
 .DS_Store
 slides/rsconnect/
 report/intro-R-marathon.html
+slides/introR-epi-dis.html
 administration/
