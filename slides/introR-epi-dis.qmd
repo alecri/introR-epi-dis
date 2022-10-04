@@ -31,7 +31,7 @@ fa_fill <- "#606060"
 ::: {.columns .v-center-container}
 ::: {.column width="60%"}
 - R-enthusiastic  
-- More than 4 years R experience  
+- More than 8 years R experience  
 - 2 packages on CRAN (and GitHub)  
 - Web applications with Shiny R  
 - Reproducible research with R markdown  
@@ -119,7 +119,6 @@ project
 │
 └───articles
 │   │   hyponatremia.pdf
-│   │   file012.txt
 │   │
 └───data
 │   └───raw
@@ -139,7 +138,7 @@ project
 │   │   ...
 │   │
 └───report
-│   │   marathon_report1.qmd
+│   │   intro-R-marathon.qmd
 │   |   ...
 │   │
 └───slides
@@ -152,6 +151,7 @@ project
 
 ## Interactive workshop
 
+Follow/reproduce in the [RStudio Cloud](https://rstudio.cloud/content/4558101)
 <br/>
 
 **1. Introduction to R and RStudio**
@@ -166,7 +166,9 @@ project
 
 **4. Introduction to More Advanced Concepts**  
 
-`scripts/03_analyses.R`
+`scripts/03_analyses.R`  
+`report/intro-R-marathon.qmd`  
+`slides/introR-epi-dis.qmd`
 
 
 # Introduction to R and RStudio  
@@ -303,4 +305,4 @@ It includes:
 
 <br>
 
-https://alecri.github.io/courses/
+(https://alecri.github.io/courses/)[https://alecri.github.io/courses/]

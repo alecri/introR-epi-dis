@@ -6,7 +6,7 @@ library(tidyverse)
 library(gtsummary)
 library(flextable)
 library(officer)
-library(gam)
+library(scales)
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 

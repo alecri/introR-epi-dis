@@ -14,7 +14,7 @@ marathon_raw <- read.csv("data/raw/marathon_raw.csv")
 
 # labeling & coding ----
 
-View(marathon_raw)        # open in a data viewer
+#View(marathon_raw)        # open in a data viewer
 head(marathon_raw, 10)    # display first 10 raw
 glimpse(marathon_raw)     # get a gimplse of the data
 names(marathon_raw)       # get the columns names
@@ -109,6 +109,32 @@ marathon %>%
   select(sex, runtime, ends_with("wt"), bmi, na) %>%
   filter(sex == "Female", runtime >= 4, bmi > 25) %>%
   arrange(desc(na), runtime)
+
+
+## advanced data management ----
+
+### pivot longer
+weight_long <- marathon %>% 
+  select(id, ends_with("wt"), sex) %>% 
+  mutate(meanwt = .5*(prewt + postwt)) %>% 
+  pivot_longer(cols = ends_with("wt"), names_to = "measure", values_to = "weight") %>% 
+  mutate(
+    measure = gsub("wt", "", measure),
+    measure = fct_inorder(measure)
+  )
+tail(weight_long)
+
+ggplot(weight_long, aes(measure, weight)) +
+  geom_boxplot() +
+  facet_wrap(~ sex)
+group_by(weight_long, sex, measure) %>% 
+  summarise(mean = mean(weight, na.rm = TRUE))
+
+
+### pivot wider
+weight_long %>% 
+  pivot_wider(id_cols = c(id, sex), names_from = measure, values_from = weight) %>% 
+  sample_n(size = 10)
 
 
 # save final data ----
