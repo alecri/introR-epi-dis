@@ -7,6 +7,7 @@ library(gtsummary)
 library(flextable)
 library(officer)
 library(scales)
+library(gam)
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 
