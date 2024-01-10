@@ -27,9 +27,10 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
+introR-epi-dis.Rproj
 00_create_raw_data.R
 .DS_Store
-slides/rsconnect/
 report/intro-R-marathon.html
-slides/introR-epi-dis.html
 administration/
+slides/
+output/
